@@ -8,6 +8,10 @@
 # Looks like we are supposed to reverse the check_key function that will allow us to call the decrypt function
 
 import hashlib
+import ast
+
+# This will use pythons ast module to grab information about the python file
+# Use AST to get the information in case the indexes of the hexdigest changes, and just cause it looked cool
 
 # Global variables defined in the challenge
 bUsername_trial = b"PRITCHARD"
@@ -72,7 +76,23 @@ def check_key(key, username_trial):
 
         return True
 
+def get_ast_function(tree, function_name):
+  for fieldname, value in tree.iter_fields(keygenme_ast):
+    return
+
 def main(): 
+  '''
+  '''
+
+  with open('keygenme-trial.py') as f:
+    keygen_python = f.read()
+
+  keygenme_ast = ast.parse(keygen_python)
+  for node in keygenme_ast.body:
+    if node.stmt == 'FunctionDef':
+  for fieldname, value in ast.iter_fields(keygenme_ast):
+    print(fieldname, value)
+
   digest = hashlib.sha256(bUsername_trial).hexdigest()
   digest_map = [4, 5, 3, 6, 2, 7, 1, 8] # This was gotten based on the check key function, grabbed the index it was checking in the order it searched
 
