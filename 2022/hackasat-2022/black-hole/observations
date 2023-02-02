@@ -1,0 +1,8 @@
+256 Bytes
+Seems to be xor of some kind
+The first byte only changes one byte of the output (via xor)
+Each value in the message we send, maps to an index of the cipher text
+seems like the size of the msg significantly changes the next message
+stop and think about the challenge, and what makes sense for the challenge to be
+message is going to be the same, the only thing thats different are the keys
+
