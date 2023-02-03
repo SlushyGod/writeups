@@ -1,4 +1,11 @@
+""" Solution
 
+    You are given an encrypted message, that uses a wierd xor encryption scheme
+    It maps bytes of the key to locations of the message, then xors the values
+    The solution requires you to first find the length of the key, then find where each byte of the key maps to
+    Submit the key for the solution
+
+    """
 
 """ Post Mortem
 
@@ -10,6 +17,7 @@
 
 from pwn import *
 import binascii
+import re
 
 HOST = '127.0.0.1'
 PORT = 5000
@@ -42,10 +50,10 @@ class MsgHarness():
 
   def get_flag(self, msg):
     self.send_msg(msg)
-    print(self.proc.recvline())
-    print(self.proc.recvline())
-    print(self.proc.recvline())
-    print(self.proc.recvline())
+    while True:
+      line = self.proc.recvline().decode()
+      if re.match(r'flag{.*}', line):
+        print(line)
 
   def get_init_msg(self):
     return self.clean_msg
@@ -73,31 +81,26 @@ def main():
   key_length = get_key_length(harness)
   cipher_msg = harness.get_init_msg()
 
-  semi_plain_msg = harness.send_msg('01'*key_length)
+  ones_msg = harness.send_msg('01'*key_length)
   one_xor_msg = xor_msg(harness.send_msg('01'*key_length), cipher_msg)
   two_xor_msg = xor_msg(harness.send_msg('02'*key_length), cipher_msg)
 
-  #print(one_xor_msg)
-  #print(two_xor_msg)
-
+  # Get the plaintext message
   real_msg = []
   msg_map = []
   for i in range(len(one_xor_msg)):
     if one_xor_msg[i] == 0 and two_xor_msg[i] == 0:
-      real_msg.append(semi_plain_msg[i])
+      real_msg.append(ones_msg[i])
       msg_map.append(0)
     else:
-      real_msg.append(semi_plain_msg[i] ^ 1)
+      real_msg.append(ones_msg[i] ^ 1)
       msg_map.append(1)
   
-  #print(key_length)
-  #print(real_msg)
-
-  # Craft inc message
-  msg = ''
+  # Craft incrementing message
+  msg = []
   for i in range(1,key_length+1):
-    msg += f'{i:02x}' # knowing how to format bytes to ints to string ints to yada yada helped a bunch
-  incr_msg = harness.send_msg(msg)
+    msg.append(f'{i:02x}')
+  incr_msg = harness.send_msg(''.join(msg))
 
   # Create key mapping
   key_mapping = [None]*key_length
@@ -109,17 +112,13 @@ def main():
       except:
         print(f'Index error: {i}, {key}')
 
-  #print(key_mapping)
-  #print(real_msg)
-  #print(cipher_msg)
-  key = '' 
+  # Get the key value using the map, plaintext, and ciphertext
+  key = []
   for i in key_mapping:
-    key += hex(real_msg[i] ^ cipher_msg[i])[2:].rjust(2, '0')
+    key_int = real_msg[i] ^ cipher_msg[i]
+    key.append(f'{key_int:02x}')
 
-  print(key)
-  print(len(key) // 2)
-  print(harness.get_flag(key))
-
+  harness.get_flag(''.join(key))
 
 if __name__ == '__main__':
   main()
