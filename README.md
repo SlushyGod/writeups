@@ -1,5 +1,10 @@
 # writeups
 Writeups from CTF challenges for future reference
 
-# Things to Remember
-- look into "common pitfalls" or "common misconfigurations" for a specific tool
+These writeups were written using Obsidian.
+
+## References:
+- https://pequalsnp-team.github.io/cheatsheet/writing-good-writeup
+- https://github.com/TFNS/writeups
+- https://github.com/p4-team/ctf
+- https://github.com/merrychap/ctf-writeups/tree/master
