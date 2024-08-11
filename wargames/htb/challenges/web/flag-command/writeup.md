@@ -75,7 +75,7 @@ async function CheckMessage() {
 It looks like sending a POST request with the command embedded will do the trick.
 
 ``` bash
-	$ curl -X POST http://94.237.59.199:32475/api/monitor \
+$ curl -X POST http://94.237.59.199:32475/api/monitor \
   -H "Content-Type: application/json" \
   -d '{"command": "Blip-blop, in a pickle with a hiccup! Shmiggity-shmack"}'
 
