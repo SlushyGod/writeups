@@ -4,8 +4,8 @@ import time
 context.binary = 'htb-console'
 context.terminal = ['gnome-terminal', '-x', 'sh', '-c']
 
-HOST = "167.99.85.216"
-PORT = "30198"
+HOST = "83.136.255.40"
+PORT = "35116"
 
 def get_process():
   #proc = process()
