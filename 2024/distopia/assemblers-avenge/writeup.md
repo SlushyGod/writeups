@@ -102,7 +102,7 @@ pwndbg> x/10i $rsp-0x8
 
 The next step is finding a method of jumping to the top of the shellcode. This can be done through the gadget `0x40106b: jmp rsi;`. Since RSI stores the value of the buffer when `read()` is called, then it can also be used for jumping to the stack. The issue here is that RSI does not contain the location of the shellcode, but of the current buffer. Getting around this is pretty easy by using a relative jump instruction `jmp -0x1a`.
 
-![img1](img1.png)
+![img1](1.svg)
 
 Put these two pieces together to execute shellcode and get the flag!
 `HTB{y0ur_l0c4l_4553mbl3R5_4v3ng3d_066023bd8dc6109e6e4547497951c2ce}`
