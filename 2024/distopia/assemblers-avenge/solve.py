@@ -14,7 +14,7 @@ HOST = '94.237.49.212'
 PORT = 39904
 
 def get_process():
-  #return process() # use this if you want to test locally
+  #return process() # use this to test locally
   return remote(HOST, PORT)
 
 def main():

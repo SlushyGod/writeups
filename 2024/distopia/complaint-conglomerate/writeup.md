@@ -1,4 +1,4 @@
-# HTB Distopia - PWN | Complaint Conglomerate
+# HTB Distopia | Complaint Conglomerate - PWN (Medium)
 
 This challenge involved filling up the heap to get a call to malloc_consolidate and convert fast bins to unsorted bins. After that leak a libc address through the unsorted bins and use that to ROP throughout the library. To trigger the ROP chain it can be performed when the complaint was processed by AI as it memcopied more data than the buffer could hold.
 
