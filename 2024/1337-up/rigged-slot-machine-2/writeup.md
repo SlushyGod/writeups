@@ -62,7 +62,7 @@ Exploiting this buffer is pretty easy, the name buffer is located at `local_28`,
 
 However we cant write `1337420` in the `current_balance` buffer because `play()` will be called first, which will change the value of `current_balance`. Since the most likely outcome is to lose money `roll < 0x1e`, we can bet one coin with the intent to lose it. This changes the value to `1337421` that we will need to write.
 
-## Solve
+## Solve Script
 ``` python
 from pwn import *
 

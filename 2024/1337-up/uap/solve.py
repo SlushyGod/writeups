@@ -1,15 +1,3 @@
-# 1337 Up | UAP - PWN (100)
-
-In progress
-
-## Initial Analysis
-How to get the building blocks of ideas for exploitation
-
-## Exploitation
-How to exploit after initial analysis
-
-## Solve
-``` python
 from pwn import *
 
 BINARY = './drone'
@@ -65,5 +53,3 @@ if __name__ == '__main__':
 
     parse_args()
     main()
-
-```
