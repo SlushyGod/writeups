@@ -1,0 +1,7 @@
+writeup.md export-ignore
+README.md export-ignore
+
+# Mark writeup.md as the default readme file
+* text=auto
+/writeup.md linguist-documentation
+/README.md linguist-documentation=false
