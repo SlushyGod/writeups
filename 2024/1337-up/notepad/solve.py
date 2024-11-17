@@ -1,15 +1,3 @@
-# 1337 Up | Notepad - PWN (100)
-
-Challenge involved getting a `.text` leak at the start of main. After that exploit the use-after-free vulnerability using tcache poisoning to modify the global variable `key` and read the flag.
-
-## Initial Analysis
-How to get the building blocks of ideas for exploitation
-
-## Exploitation
-How to exploit after initial analysis
-
-## Solve
-``` python
 from pwn import *
 
 BINARY = './notepad'
@@ -83,4 +71,3 @@ if __name__ == '__main__':
 
     parse_args()
     main()
-```

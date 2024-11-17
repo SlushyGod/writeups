@@ -1,15 +1,3 @@
-# 1337 Up | Notepad 2 - PWN (162)
-
-This challenge involves exploiting a format string vulnerability to leak `libc_start_main` and overwrite an address in the Global Offset Table (GOT) to the address of `system`. After doing that you can call `system('/bin/sh')`.
-
-## Initial Analysis
-How to get the building blocks of ideas for exploitation
-
-## Exploitation
-How to exploit after initial analysis
-
-## Solve
-``` python
 from pwn import *
 
 BINARY = './notepad2'
@@ -88,4 +76,3 @@ if __name__ == '__main__':
 
     parse_args()
     main()
-```
